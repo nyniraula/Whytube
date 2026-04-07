@@ -4,7 +4,21 @@ import subprocess
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError
 
-opts = {"no_warnings": True, "quiet": True}
+opts = {
+    "no_warnings": True,
+    "quiet": True,
+    "merge_output_format": "mp4",
+    "outtmpl": "%(title)s.%(ext)s - %(uploader)s",
+    "embedthumbnail": True,
+    "js_runtimes": {
+        "deno": {"path": None},
+        "node": {"path": "C:\\Program Files\\nodejs\\node.exe"},
+    },
+}
+
+
+def clearTerminal():
+    subprocess.run("cls" if os.name == "nt" else "clear", shell=True)
 
 
 def get_media_url():
@@ -16,7 +30,7 @@ def get_media_url():
             break
 
         except ValueError:
-            subprocess.run("cls" if os.name == "nt" else "clear", shell=True)
+            clearTerminal()
             pass
 
     return url
@@ -31,14 +45,13 @@ def fetch_media_info():
                 break
 
             except DownloadError:
-                subprocess.run("cls" if os.name == "nt" else "clear", shell=True)
+                clearTerminal()
                 print("Invalid url, Try again!")
 
-        return media_info
+        return [url, media_info]
 
 
 def sanitize_formats(formats):
-
     sanitized_data = []
     for format in formats:
         ext = format.get("ext")
@@ -47,16 +60,47 @@ def sanitize_formats(formats):
         if ext == "mp4" and vcodec.find("av01") >= 0:
             sanitized_data.append(format)
 
-    return sanitized_data
+    return sanitized_data[-4:]  # hardcoded to return only the last 4 resolutions
+
+
+def download_media(format_id, url):
+    opts.update({"format": f"{format_id}+bestaudio"})
+
+    with YoutubeDL(opts) as ydl:
+        ydl.download(url)
 
 
 def main():
-    media_info = fetch_media_info()
-    formats = media_info["formats"]
+
+    url, media_info = fetch_media_info()
+    title = media_info.get("title")
+    formats = media_info.get("formats")
+
+    print(title)
 
     downloadable_formats = sanitize_formats(formats)
 
-    print(downloadable_formats)
+    print("Choose a resolution to download: ")
+
+    for i, f in enumerate(downloadable_formats):
+        print(f"{i + 1}. {f.get('format_note')} ({f.get('resolution')})")
+
+    while True:
+        try:
+            choice = int(input(": "))
+            if choice < 1 or choice >= len(downloadable_formats):
+                raise ValueError("Choice exceeds the limiting capacity")
+            print(choice)
+
+            break
+
+        except ValueError:
+            clearTerminal()
+            pass
+
+        format_id = downloadable_formats[choice - 1].get("format_id")
+
+        download_media(format_id, url)
 
 
 main()

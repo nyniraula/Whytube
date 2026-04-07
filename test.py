@@ -1,2 +1,9 @@
-li = [1, 2, 3, 4, 5, 6, 7, 8]
-print(li[-9])
+from yt_dlp import YoutubeDL
+
+opts = {"quiet": True, "no_warnings": True, "format": "399+bestaudio"}
+
+url = input("URL?: ")
+
+li = []
+with YoutubeDL(opts) as ydl:
+    ydl.download(url)
