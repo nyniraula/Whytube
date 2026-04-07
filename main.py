@@ -2,6 +2,7 @@ import copy
 import json
 import os
 import subprocess
+from pathlib import Path
 
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError
@@ -9,6 +10,12 @@ from yt_dlp.utils import DownloadError
 # Loads the config from the json file
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
+
+home_folder = Path.home()
+downloads = home_folder / "Downloads"  # pathlib join those into single path
+config["outtmpl"] = str(
+    downloads / "%(title)s - %(uploader)s.%(ext)s"
+)  # updates save path to downloads dir
 
 
 def clearTerminal():
@@ -55,7 +62,7 @@ def sanitize_formats(formats):
 
 def download_media(format_id, url):
     opts = copy.deepcopy(config)
-    opts.update({"format": f"{format_id}+bestaudio"})
+    opts["format"] = f"{format_id}+bestaudio"
 
     with YoutubeDL(opts) as ydl:
         ydl.download(url)
