@@ -1,3 +1,6 @@
+import os
+import subprocess
+
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError
 
@@ -13,7 +16,8 @@ def get_media_url():
             break
 
         except ValueError:
-            print("Invalid URL pattern")
+            subprocess.run("cls" if os.name == "nt" else "clear", shell=True)
+            pass
 
     return url
 
@@ -27,9 +31,32 @@ def fetch_media_info():
                 break
 
             except DownloadError:
+                subprocess.run("cls" if os.name == "nt" else "clear", shell=True)
                 print("Invalid url, Try again!")
 
         return media_info
-    
 
-    
+
+def sanitize_formats(formats):
+
+    sanitized_data = []
+    for format in formats:
+        ext = format.get("ext")
+        vcodec = format.get("vcodec")
+
+        if ext == "mp4" and vcodec.find("av01") >= 0:
+            sanitized_data.append(format)
+
+    return sanitized_data
+
+
+def main():
+    media_info = fetch_media_info()
+    formats = media_info["formats"]
+
+    downloadable_formats = sanitize_formats(formats)
+
+    print(downloadable_formats)
+
+
+main()
