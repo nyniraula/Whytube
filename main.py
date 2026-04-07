@@ -41,25 +41,26 @@ def fetch_media_info():
                 clearTerminal()
                 print("Invalid url, Try again!")
 
-        return [url, media_info]
+        return (url, media_info)
 
 
 def sanitize_formats(formats):
     sanitized_data = []
-    for format in formats:
-        ext = format.get("ext")
-        vcodec = format.get("vcodec")
+    for f in formats:
+        ext = f.get("ext")
+        vcodec = f.get("vcodec")
 
-        if ext == "mp4" and vcodec.find("av01") >= 0:
-            sanitized_data.append(format)
+        if ext == "mp4" and "av01" in vcodec:
+            sanitized_data.append(f)
 
     return sanitized_data[-4:]  # hardcoded to return only the last 4 resolutions
 
 
 def download_media(format_id, url):
-    config.update({"format": f"{format_id}+bestaudio"})
+    opts = config.copy.deepcopy()
+    opts.update({"format": f"{format_id}+bestaudio"})
 
-    with YoutubeDL(config) as ydl:
+    with YoutubeDL(opts) as ydl:
         ydl.download(url)
 
 
@@ -79,7 +80,7 @@ def main():
     while True:
         try:
             choice = int(input(": "))
-            if choice < 1 or choice >= len(downloadable_formats):
+            if choice < 1 or choice > len(downloadable_formats):
                 raise ValueError("Choice exceeds the limiting capacity")
 
             break
