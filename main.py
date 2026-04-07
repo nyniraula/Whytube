@@ -45,13 +45,9 @@ def fetch_media_info():
 
 
 def sanitize_formats(formats):
-    sanitized_data = []
-    for f in formats:
-        ext = f.get("ext")
-        vcodec = f.get("vcodec")
-
-        if ext == "mp4" and "av01" in vcodec:
-            sanitized_data.append(f)
+    sanitized_data = [
+        f for f in formats if f.get("ext") == "mp4" and "av01" in f.get("vcodec", "")
+    ]
 
     return sanitized_data[-4:]  # hardcoded to return only the last 4 resolutions
 
