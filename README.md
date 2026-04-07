@@ -7,9 +7,10 @@ A simple command-line tool to download YouTube videos in your preferred resoluti
 - Python 3.10+ (though it lists 3.14 in uv.lock)
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - [FFmpeg](https://ffmpeg.org/) (required for merging video and audio)
+- uv as a package manager (You can still run it with pip but thats on you to configure)
 
 ```bash
-pip install yt-dlp[default]
+uv add yt-dlp[default]
 ```
 
 ## Setup
