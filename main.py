@@ -1,20 +1,13 @@
+import json
 import os
 import subprocess
 
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError
 
-opts = {
-    "no_warnings": True,
-    "quiet": True,
-    "merge_output_format": "mp4",
-    "outtmpl": "%(title)s.%(ext)s - %(uploader)s",
-    "embedthumbnail": True,
-    "js_runtimes": {
-        "deno": {"path": None},
-        "node": {"path": "C:\\Program Files\\nodejs\\node.exe"},
-    },
-}
+# Loads the config from the json file
+with open("config.json", "r") as config_file:
+    config = json.load(config_file)
 
 
 def clearTerminal():
@@ -37,7 +30,7 @@ def get_media_url():
 
 
 def fetch_media_info():
-    with YoutubeDL(opts) as ydl:
+    with YoutubeDL(config) as ydl:
         while True:
             try:
                 url = get_media_url()
@@ -64,23 +57,21 @@ def sanitize_formats(formats):
 
 
 def download_media(format_id, url):
-    opts.update({"format": f"{format_id}+bestaudio"})
+    config.update({"format": f"{format_id}+bestaudio"})
 
-    with YoutubeDL(opts) as ydl:
+    with YoutubeDL(config) as ydl:
         ydl.download(url)
 
 
 def main():
-
     url, media_info = fetch_media_info()
     title = media_info.get("title")
     formats = media_info.get("formats")
 
     print(title)
+    print("Choose a resolution to download: ")
 
     downloadable_formats = sanitize_formats(formats)
-
-    print("Choose a resolution to download: ")
 
     for i, f in enumerate(downloadable_formats):
         print(f"{i + 1}. {f.get('format_note')} ({f.get('resolution')})")
@@ -90,17 +81,17 @@ def main():
             choice = int(input(": "))
             if choice < 1 or choice >= len(downloadable_formats):
                 raise ValueError("Choice exceeds the limiting capacity")
-            print(choice)
 
             break
 
         except ValueError:
-            clearTerminal()
+            # clearTerminal()
             pass
 
-        format_id = downloadable_formats[choice - 1].get("format_id")
+    format_id = downloadable_formats[choice - 1].get("format_id")
 
-        download_media(format_id, url)
+    download_media(format_id, url)
 
 
-main()
+if __name__ == "__main__":
+    main()

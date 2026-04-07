@@ -1,0 +1,14 @@
+{
+  "no_warnings": true,
+  "quiet": true,
+  "merge_output_format": "mp4",
+  "outtmpl": "%(title)s.%(ext)s - %(uploader)s",
+  "js_runtimes": {
+    "deno": {
+      "path": null
+    },
+    "node": {
+      "path": "C:\\Program Files\\nodejs\\node.exe"
+    }
+  }
+}
