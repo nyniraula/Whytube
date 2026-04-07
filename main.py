@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import subprocess
@@ -53,7 +54,7 @@ def sanitize_formats(formats):
 
 
 def download_media(format_id, url):
-    opts = config.copy.deepcopy()
+    opts = copy.deepcopy(config)
     opts.update({"format": f"{format_id}+bestaudio"})
 
     with YoutubeDL(opts) as ydl:
