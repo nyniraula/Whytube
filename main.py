@@ -13,8 +13,9 @@ from utils import ranking, resolver
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
 # Load download type constants
-DOWNLOAD_TYPE = config["download_type"].lower()
-PLAYLIST_DOWNLOAD_TYPE = config["playlist_download_type"].lower()
+DOWNLOAD_TYPE = config.get("download_type", "video").lower()
+PLAYLIST_DOWNLOAD_TYPE = config.get("playlist_download_type", "video").lower()
+PLAYLIST_DOWNLOAD_CAP = config.get("playlist_download_cap", "1080")
 
 # Sets the download Folder
 home_folder = Path.home()
@@ -82,7 +83,9 @@ def main():
         if PLAYLIST_DOWNLOAD_TYPE == "audio":
             download_media("bestaudio[ext=m4a]", url)
         else:
-            download_media("bestvideo[height<=1080]+bestaudio[ext=m4a]", url)
+            download_media(
+                f"bestvideo[height<={PLAYLIST_DOWNLOAD_CAP}]+bestaudio[ext=m4a]", url
+            )
 
         print("\n Finished Playlist download")
         return

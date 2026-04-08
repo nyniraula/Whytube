@@ -5,6 +5,7 @@
   "outtmpl": "%(title)s - %(uploader)s.%(ext)s",
   "download_type": "video",
   "playlist_download_type": "audio",
+  "playlist_download_cap": "1080",
 
   "postprocessor_args": {
     "ffmpeg": ["-c:a", "aac"]
