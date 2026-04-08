@@ -1,6 +1,6 @@
 {
   "no_warnings": true,
-  "quiet": false,
+  "quiet": true,
   "merge_output_format": "mp4",
   "outtmpl": "%(title)s.%(ext)s - %(uploader)s",
 

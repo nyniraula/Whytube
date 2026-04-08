@@ -13,12 +13,18 @@ from utils import ranking, resolver
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
 
+
+
 # Sets the download Folder
 home_folder = Path.home()
 downloads = home_folder / "Downloads"  # pathlib join those into single path
 config["outtmpl"] = str(
     downloads / "%(title)s - %(uploader)s.%(ext)s"
 )  # updates save path to downloads dir
+
+
+def check_if_playlist(url):
+    return "list=" in url
 
 
 def clearTerminal():
@@ -66,9 +72,16 @@ def download_media(format_id, url):
 def main():
     url, media_info = fetch_media_info()
     title = media_info.get("title")
-    formats = media_info.get("formats")
+
+    if check_if_playlist(url):
+        print(f"\n[PLAYLIST]: {title}")
+        # download_media("bestvideo[height<=1080]")
+        # print("\n Finished Playlist download")
+        return
 
     print(f"\nTitle: {title}\n")
+    formats = media_info.get("formats")
+
     print("Choose a resolution to download: \n")
 
     ranked_data = ranking.rank_format_options(formats)
