@@ -7,10 +7,13 @@ from pathlib import Path
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError
 
+from utils import ranking, resolver
+
 # Loads the config from the json file
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
 
+# Sets the download Folder
 home_folder = Path.home()
 downloads = home_folder / "Downloads"  # pathlib join those into single path
 config["outtmpl"] = str(
@@ -52,14 +55,6 @@ def fetch_media_info():
         return (url, media_info)
 
 
-def sanitize_formats(formats):
-    sanitized_data = [
-        f for f in formats if f.get("ext") == "mp4" and "av01" in f.get("vcodec", "")
-    ]
-
-    return sanitized_data[-4:]  # hardcoded to return only the last 4 resolutions
-
-
 def download_media(format_id, url):
     opts = copy.deepcopy(config)
     opts["format"] = f"{format_id}+bestaudio"
@@ -73,10 +68,12 @@ def main():
     title = media_info.get("title")
     formats = media_info.get("formats")
 
-    print(title)
-    print("Choose a resolution to download: ")
+    print(f"\nTitle: {title}\n")
+    print("Choose a resolution to download: \n")
 
-    downloadable_formats = sanitize_formats(formats)
+    ranked_data = ranking.rank_format_options(formats)
+
+    downloadable_formats = resolver.resolve_format_options(ranked_data, formats)
 
     for i, f in enumerate(downloadable_formats):
         print(f"{i + 1}. {f.get('format_note')} ({f.get('resolution')})")
@@ -96,6 +93,8 @@ def main():
     format_id = downloadable_formats[choice - 1].get("format_id")
 
     download_media(format_id, url)
+
+    print("\nFinished Downloading")
 
 
 if __name__ == "__main__":
