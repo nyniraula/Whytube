@@ -1,22 +1,11 @@
 {
   "no_warnings": true,
-  "quiet": true,
+  "quiet": false,
   "merge_output_format": "mp4",
   "outtmpl": "%(title)s.%(ext)s - %(uploader)s",
-  "postprocessors": [
-    {
-      "key": "FFmpegMetadata"
-    },
-    {
-      "key": "FFmpegVideoRemuxer",
-      "preferedformat": "mp4"
-    }
-  ],
+
   "postprocessor_args": {
-    "ffmpeg": [
-      "-c:a",
-      "aac"
-    ]
+    "ffmpeg": ["-c:a", "aac"]
   },
   "js_runtimes": {
     "deno": {

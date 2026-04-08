@@ -57,7 +57,7 @@ def fetch_media_info():
 
 def download_media(format_id, url):
     opts = copy.deepcopy(config)
-    opts["format"] = f"{format_id}+bestaudio"
+    opts["format"] = f"{format_id}+bestaudio[ext=m4a]"
 
     with YoutubeDL(opts) as ydl:
         ydl.download(url)

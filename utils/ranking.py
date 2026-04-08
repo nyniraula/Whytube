@@ -15,7 +15,7 @@ def rank_format_options(formats):
 
         # loops thru codec and check if the format vcodec startswith that priority codec items and index + 1 is the rank. (Lower the rank, the better)
         for codec in CODEC_PRIORITY:
-            if f_vcodec.startswith(codec) and f_ext in EXT_PRIORITY:
+            if f_vcodec and f_vcodec.startswith(codec) and f_ext in EXT_PRIORITY:
                 codec_rank = CODEC_PRIORITY.index(codec)
                 ext_rank = EXT_PRIORITY.index(f_ext)
                 data = {

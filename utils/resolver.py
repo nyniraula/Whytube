@@ -5,13 +5,13 @@ def resolve_format_options(rank_data, formats):
     )
 
     sanitized_data = []
-    resolution_hash = []
+    resolution_hash = set()
 
     # loop thru the sorted data and if a resolution is not in the hash, add it to the sanitized_data and add it to the hash to remove repeating values, since the first value is always the highest rank aka best preference, the best quality option for that resolution is only displayed
     for data in sorted_data:
         if data["resolution"] not in resolution_hash:
             sanitized_data.append(data)
-            resolution_hash.append(data["resolution"])
+            resolution_hash.add(data["resolution"])
 
     # list comp generator exp for a True False list passed to any to resolve True if any value is True
     if any(res >= 720 for res in resolution_hash):
