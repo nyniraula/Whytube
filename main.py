@@ -12,8 +12,9 @@ from utils import ranking, resolver
 # Loads the config from the json file
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
-
-
+# Load download type constants
+DOWNLOAD_TYPE = config["download_type"].lower()
+PLAYLIST_DOWNLOAD_TYPE = config["playlist_download_type"].lower()
 
 # Sets the download Folder
 home_folder = Path.home()
@@ -23,10 +24,6 @@ config["outtmpl"] = str(
 )  # updates save path to downloads dir
 
 
-def check_if_playlist(url):
-    return "list=" in url
-
-
 def clearTerminal():
     subprocess.run("cls" if os.name == "nt" else "clear", shell=True)
 
@@ -34,7 +31,7 @@ def clearTerminal():
 def get_media_url():
     while True:
         try:
-            url = input("Media Url: ").strip()
+            url = input("Video url: ").strip()
             if not url:
                 raise ValueError
             break
@@ -61,51 +58,69 @@ def fetch_media_info():
         return (url, media_info)
 
 
-def download_media(format_id, url):
+def check_if_playlist(url):
+    return "list=" in url
+
+
+def download_media(fmt, url):
     opts = copy.deepcopy(config)
-    opts["format"] = f"{format_id}+bestaudio[ext=m4a]"
+    opts["format"] = f"{fmt}"
 
     with YoutubeDL(opts) as ydl:
         ydl.download(url)
 
 
 def main():
+
     url, media_info = fetch_media_info()
     title = media_info.get("title")
 
+    # runs if block if url is a playlist
     if check_if_playlist(url):
-        print(f"\n[PLAYLIST]: {title}")
-        # download_media("bestvideo[height<=1080]")
-        # print("\n Finished Playlist download")
+        print(f"\n[DOWNLOADING PLAYLIST]: {title}")
+
+        if PLAYLIST_DOWNLOAD_TYPE == "audio":
+            download_media("bestaudio[ext=m4a]", url)
+        else:
+            download_media("bestvideo[height<=1080]+bestaudio[ext=m4a]", url)
+
+        print("\n Finished Playlist download")
         return
 
+    # for normal video
     print(f"\nTitle: {title}\n")
-    formats = media_info.get("formats")
 
-    print("Choose a resolution to download: \n")
+    if DOWNLOAD_TYPE == "audio":
+        download_media("bestaudio[ext=m4a]", url)
+    else:
+        formats = media_info.get("formats")
 
-    ranked_data = ranking.rank_format_options(formats)
+        print("Choose a resolution to download: \n")
 
-    downloadable_formats = resolver.resolve_format_options(ranked_data, formats)
+        ranked_data = ranking.rank_format_options(formats)
 
-    for i, f in enumerate(downloadable_formats):
-        print(f"{i + 1}. {f.get('format_note')} ({f.get('resolution')})")
+        downloadable_formats = resolver.resolve_format_options(ranked_data, formats)
 
-    while True:
-        try:
-            choice = int(input(": "))
-            if choice < 1 or choice > len(downloadable_formats):
-                raise ValueError("Choice exceeds the limiting capacity")
+        for i, f in enumerate(downloadable_formats):
+            print(f"{i + 1}. {f.get('format_note')} ({f.get('resolution')})")
 
-            break
+        while True:
+            try:
+                choice = int(input(": "))
+                if choice < 1 or choice > len(downloadable_formats):
+                    raise ValueError("Choice exceeds the limiting capacity")
 
-        except ValueError:
-            # clearTerminal()
-            pass
+                break
 
-    format_id = downloadable_formats[choice - 1].get("format_id")
+            except ValueError:
+                # clearTerminal()
+                pass
 
-    download_media(format_id, url)
+        format_id = downloadable_formats[choice - 1].get("format_id")
+
+        fmt = f"{format_id}+bestaudio[ext=m4a]"
+
+        download_media(fmt, url)
 
     print("\nFinished Downloading")
 
