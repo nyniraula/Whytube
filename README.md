@@ -33,6 +33,7 @@ cd whytube
 uv sync
 ```
 
+> [!TIP]
 > If you prefer pip: `pip install yt-dlp[default]`
 
 ### 3. Configure Node.js path (for JS challenge solving)
@@ -60,16 +61,18 @@ uv run main.py
 ### Single video
 
 1. Paste a YouTube URL when prompted
-2. Pick a resolution from the list (720p and above only, unless unavailable)
+2. Pick a resolution from the list (720p and above, provides lower res when >720 unavailable)
 3. Done — video saves to your `~/Downloads` folder
 
 ### Playlist
 
-Paste a playlist URL and Whytube handles the rest automatically — no per-video prompts. Caps at 1080p by default.
+Paste a playlist URL and Whytube handles the rest automatically — no per-video prompts. Caps at 1080p by default (configurable).
 
-- `playlist_download_cap` — maximum resolution for playlist video downloads. Accepts height values only: `"720"`, `"1080"`, `"1440"`, `"2160"` etc. yt-dlp will pick the best available quality at or below that cap.
+- `playlist_download_cap` — maximum resolution for playlist video downloads. Accepts height values only: `"720"`, `"1080"`, `"1440"`, `"2160"` etc. yt-dlp will pick the best available quality at or below that cap. Defaults to `"1080"` if missing.
 
-  If the key is missing, it defaults to `"1080"` for the cap.
+```json
+"playlist_download_cap": "1080"
+```
 
 ## Download types
 
@@ -78,12 +81,12 @@ Control what gets downloaded via these keys in `config.json`:
 - `download_type` — applies to single video URLs. Set to `"video"` or `"audio"`
 - `playlist_download_type` — applies to playlist URLs. Set to `"video"` or `"audio"`
 
-If any key is missing or set to an unrecognised value, it defaults to `"video"` for download types.
+> [!NOTE]
+> If any key is missing or set to an unrecognised value, it defaults to `"video"`.
 
 ```json
 "download_type": "video",
-"playlist_download_type": "audio",
-"playlist_download_cap": "1080"
+"playlist_download_type": "audio"
 ```
 
 ## Config
@@ -112,6 +115,9 @@ Full `config.json` for reference:
   }
 }
 ```
+
+> [!WARNING]
+> `outtmpl` is overridden at runtime to save files in your `~/Downloads` folder. Editing it in `config.json` has no effect unless you modify the path in `main.py`.
 
 ## Notes
 
