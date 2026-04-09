@@ -17,6 +17,7 @@ If your preferred codec or container isn't available, it gracefully falls back t
 - Python 3.10+
 - [FFmpeg](https://ffmpeg.org/) — required for merging video and audio streams
 - [uv](https://github.com/astral-sh/uv) — recommended package manager
+- Node.js or Deno — required for solving YouTube's JS challenges
 
 ## Setup
 
@@ -36,43 +37,83 @@ uv sync
 > [!TIP]
 > If you prefer pip: `pip install yt-dlp[default]`
 
-### 3. Configure Node.js path (for JS challenge solving)
-
-Open `config.json` and update the `node` path under `js_runtimes` to match your Node.js installation:
-
-```json
-"js_runtimes": {
-  "node": {
-    "path": "C:\\Program Files\\nodejs\\node.exe"
-  }
-}
-```
-
-Find your Node path with `where node` (Windows) or `which node` (Mac/Linux).
-
-### 4. Run
+### 3. Run
 
 ```bash
 uv run main.py
 ```
+
+Whytube will automatically detect your Node.js or Deno installation and configure itself. No manual path setup needed.
 
 ## Usage
 
 ### Single video
 
 1. Paste a YouTube URL when prompted
-2. Pick a resolution from the list (720p and above, provides lower res when >720 unavailable)
-3. Done — video saves to your `~/Downloads` folder
+2. Pick a resolution from the list (720p and above, falls back to lower if unavailable)
+3. Done — video saves to `~/Downloads/WT_Downloads/`
 
 ### Playlist
 
 Paste a playlist URL and Whytube handles the rest automatically — no per-video prompts. Caps at 1080p by default (configurable).
 
-- `playlist_download_cap` — maximum resolution for playlist video downloads. Accepts height values only: `"720"`, `"1080"`, `"1440"`, `"2160"` etc. yt-dlp will pick the best available quality at or below that cap. Defaults to `"1080"` if missing.
+### Audio
+
+Set `download_type` or `playlist_download_type` to `"audio"` in `config.json` to download audio-only as `.m4a`.
+
+## Module breakdown
+
+| Module               | What it does                                                 |
+| -------------------- | ------------------------------------------------------------ |
+| `source_handler.py`  | Loads config, sets up the download directory                 |
+| `URLresolver.py`     | Handles URL input, validates it, fetches media info          |
+| `MediaPipeline.py`   | Routes to the right handler — video, audio, or playlist      |
+| `downloader.py`      | Wraps yt-dlp's YoutubeDL and triggers the download           |
+| `format_ranking.py`  | Ranks available formats by codec and container preference    |
+| `format_resolver.py` | Deduplicates and filters ranked formats, enforces 720p floor |
+| `dependencies.py`    | Checks for FFmpeg, detects and configures JS runtime         |
+| `cleanup.py`         | Removes leftover thumbnail files after each download         |
+| `terminal.py`        | Cross-platform terminal clear                                |
+
+## Config
+
+Full `config.json` for reference:
 
 ```json
-"playlist_download_cap": "1080"
+{
+  "no_warnings": true,
+  "quiet": true,
+  "merge_output_format": "mp4",
+  "outtmpl": "%(title)s - %(uploader)s.%(ext)s",
+  "download_type": "video",
+  "writesubtitles": false,
+  "writeautomaticsub": true,
+  "subtitleslangs": ["en"],
+  "subtitlesformat": "srt/ass/vtt",
+  "playlist_download_type": "video",
+  "playlist_download_cap": "1080",
+  "postprocessor_args": {
+    "ffmpeg": ["-c:a", "aac"]
+  },
+  "writethumbnail": true,
+  "embedthumbnail": true,
+  "postprocessors": [
+    {
+      "key": "EmbedThumbnail"
+    }
+  ],
+  "js_runtimes": {
+    "deno": { "path": null },
+    "node": { "path": null }
+  }
+}
 ```
+
+> [!NOTE]
+> `js_runtimes` paths are automatically detected and updated at startup — you don't need to set these manually.
+
+> [!WARNING]
+> `outtmpl` is overridden at runtime to save files in `~/Downloads/WT_Downloads/`. Editing it in `config.json` only changes the filename template, not the folder.
 
 ## Download types
 
@@ -84,16 +125,11 @@ Control what gets downloaded via these keys in `config.json`:
 > [!NOTE]
 > If any key is missing or set to an unrecognised value, it defaults to `"video"`.
 
-```json
-"download_type": "video",
-"playlist_download_type": "audio"
-```
-
 ## Subtitles
 
 Whytube can download a separate subtitle file alongside the video. Controlled via these keys in `config.json`:
 
-- `writeautomaticsub` — downloads auto-generated subtitles (YouTube's AI captions). On by default. Works on almost every video
+- `writeautomaticsub` — downloads auto-generated subtitles. On by default. Works on almost every video
 - `writesubtitles` — downloads manually uploaded subtitles if the creator provided them
 - `subtitleslangs` — list of language tracks to download. Defaults to `["en"]`
 - `subtitlesformat` — preferred format. `srt/ass/vtt` tries each in order, falling back if unavailable
@@ -106,56 +142,27 @@ Whytube can download a separate subtitle file alongside the video. Controlled vi
 ```
 
 > [!NOTE]
-> With the default config, you'll get one `.srt` file for almost every video. Enabling both `writesubtitles` and `writeautomaticsub` may produce two subtitle files on videos that have both manual and auto-generated tracks.
+> With the default config you'll get one `.srt` file for almost every video. Enabling both `writesubtitles` and `writeautomaticsub` may produce two subtitle files on videos that have both manual and auto-generated tracks.
 
 > [!TIP]
 > To disable subtitles entirely, set both `writesubtitles` and `writeautomaticsub` to `false`.
 
-## Config
+## Thumbnails
 
-Full `config.json` for reference:
+Whytube embeds thumbnails directly into the video file and cleans up the leftover image file automatically after each download. No stray `.jpg` or `.webp` files.
+
+To disable thumbnail embedding:
 
 ```json
-{
-  "no_warnings": true,
-  "quiet": true,
-
-  //Output config
-  "merge_output_format": "mp4",
-  "outtmpl": "%(title)s - %(uploader)s.%(ext)s",
-  "download_type": "video",
-
-  //Subtitle Config
-  "writesubtitles": false,
-  "writeautomaticsub": true,
-  "subtitleslangs": ["en"],
-  "subtitlesformat": "srt/ass/vtt",
-
-  //Playlist Config
-  "playlist_download_type": "audio",
-  "playlist_download_cap": "1080",
-
-  
-  "postprocessor_args": {
-    "ffmpeg": ["-c:a", "aac"]
-  },
-  "js_runtimes": {
-    "deno": {
-      "path": null
-    },
-    "node": {
-      "path": "C:\\Program Files\\nodejs\\node.exe"
-    }
-  }
-}
+"writethumbnail": false,
+"embedthumbnail": false,
+"postprocessors": []
 ```
-
-> [!WARNING]
-> `outtmpl` is overridden at runtime to save files in your `~/Downloads` folder. Editing it in `config.json` has no effect unless you modify the path in `main.py`.
 
 ## Notes
 
 - Video and audio are downloaded as separate streams and merged via FFmpeg into a final `.mp4`
 - Audio is re-encoded to AAC for maximum compatibility
-- The merge step may take a few seconds depending on file size — this is normal
-- Playlist downloads default to best available quality up to 1080p with no user interaction required
+- FFmpeg is required — Whytube will exit with a clear error message if it's not found
+- JS runtime (Node.js or Deno) is required for solving YouTube's challenge — Whytube auto-detects whichever is installed
+- Config is reloaded every download loop, so changes to `config.json` take effect without restarting
