@@ -79,59 +79,69 @@ def main():
     # TODO: Organize CODE STRUCTURE
     # TODO: FFMPEG CHECK and fallbacks
 
-    url, media_info = fetch_media_info()
-    title = media_info.get("title")
+    while True:
+        url, media_info = fetch_media_info()
+        title = media_info.get("title")
 
-    # runs if block if url is a playlist
-    if check_if_playlist(url):
-        print(f"\n[DOWNLOADING PLAYLIST]: {title}")
+        # runs if block if url is a playlist
+        if check_if_playlist(url):
+            print(f"\n[DOWNLOADING PLAYLIST]: {title}")
 
-        if PLAYLIST_DOWNLOAD_TYPE == "audio":
-            download_media("bestaudio[ext=m4a]", url)
+            if PLAYLIST_DOWNLOAD_TYPE == "audio":
+                download_media("bestaudio[ext=m4a]", url)
+            else:
+                download_media(
+                    f"bestvideo[height<={PLAYLIST_DOWNLOAD_CAP}]+bestaudio[ext=m4a]",
+                    url,
+                )
         else:
-            download_media(
-                f"bestvideo[height<={PLAYLIST_DOWNLOAD_CAP}]+bestaudio[ext=m4a]", url
-            )
+            # for normal video
+            print(f"\nTitle: {title}\n")
 
-        print("\n Finished Playlist download")
-        return
+            if DOWNLOAD_TYPE == "audio":
+                download_media("bestaudio[ext=m4a]", url)
+            else:
+                formats = media_info.get("formats")
 
-    # for normal video
-    print(f"\nTitle: {title}\n")
+                print("Choose a resolution to download: \n")
 
-    if DOWNLOAD_TYPE == "audio":
-        download_media("bestaudio[ext=m4a]", url)
-    else:
-        formats = media_info.get("formats")
+                ranked_data = ranking.rank_format_options(formats)
 
-        print("Choose a resolution to download: \n")
+                downloadable_formats = resolver.resolve_format_options(
+                    ranked_data, formats
+                )
 
-        ranked_data = ranking.rank_format_options(formats)
+                for i, f in enumerate(downloadable_formats):
+                    print(f"{i + 1}. {f.get('format_note')} ({f.get('resolution')})")
 
-        downloadable_formats = resolver.resolve_format_options(ranked_data, formats)
+                while True:
+                    try:
+                        choice = int(input(": "))
+                        if choice < 1 or choice > len(downloadable_formats):
+                            raise ValueError("Choice exceeds the limiting capacity")
 
-        for i, f in enumerate(downloadable_formats):
-            print(f"{i + 1}. {f.get('format_note')} ({f.get('resolution')})")
+                        break
 
-        while True:
-            try:
-                choice = int(input(": "))
-                if choice < 1 or choice > len(downloadable_formats):
-                    raise ValueError("Choice exceeds the limiting capacity")
+                    except ValueError:
+                        # clearTerminal()
+                        pass
 
-                break
+                format_id = downloadable_formats[choice - 1].get("format_id")
 
-            except ValueError:
-                # clearTerminal()
-                pass
+                fmt = f"{format_id}+bestaudio[ext=m4a]"
 
-        format_id = downloadable_formats[choice - 1].get("format_id")
+                download_media(fmt, url)
 
-        fmt = f"{format_id}+bestaudio[ext=m4a]"
+        print("\nFinished Downloading")
 
-        download_media(fmt, url)
+        # Download Another Prompt
+        quit_status = input("\nDownload Another? [y/N]: ")
 
-    print("\nFinished Downloading")
+        if not quit_status.lower() == "y":
+            print("System Shutting Down")
+            break
+
+        clearTerminal()
 
 
 if __name__ == "__main__":
