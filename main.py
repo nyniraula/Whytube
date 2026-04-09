@@ -12,13 +12,13 @@ def main():
     # manage js_runtime_config
     dependencies.config_js_runtime()
 
-    # Loads the config from the json file and also manages output dir and path
-    config, DOWNLOAD_TYPE, PLAYLIST_DOWNLOAD_TYPE, PLAYLIST_DOWNLOAD_CAP = (
-        source_handler.setup()
-    )
-
     # Program Loop
     while True:
+        # Loads the config from the json file and also manages output dir and path
+        config, DOWNLOAD_TYPE, PLAYLIST_DOWNLOAD_TYPE, PLAYLIST_DOWNLOAD_CAP = (
+            source_handler.setup()
+        )
+
         url, media_info = URLresolver.fetch_media_info(config)
         title = media_info.get("title")
 
