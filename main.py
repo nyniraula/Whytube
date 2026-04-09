@@ -21,7 +21,7 @@ PLAYLIST_DOWNLOAD_CAP = config.get("playlist_download_cap", "1080")
 home_folder = Path.home()
 downloads = home_folder / "Downloads"  # pathlib join those into single path
 config["outtmpl"] = str(
-    downloads / "%(title)s - %(uploader)s.%(ext)s"
+    downloads / config["outtmpl"]
 )  # updates save path to downloads dir
 
 
@@ -73,7 +73,6 @@ def download_media(fmt, url):
 
 def main():
 
-    # TODO: Add subtitle download
     # TODO: Embed thubmnails into video
     # TODO: Organize CODE STRUCTURE
     # TODO: FFMPEG CHECK and fallbacks

@@ -2,7 +2,7 @@
   "no_warnings": true,
   "quiet": true,
   "merge_output_format": "mp4",
-  "outtmpl": "%(title)s - %(uploader)s.%(ext)s",
+  "outtmpl": "WT_Downloads/%(title)s - %(uploader)s.%(ext)s",
   "download_type": "video",
 
   "writesubtitles": false,
