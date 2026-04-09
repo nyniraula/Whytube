@@ -1,8 +1,16 @@
-from utils import MediaPipeline, URLresolver, cleanup, source_handler
+from utils import MediaPipeline, URLresolver, cleanup, dependencies, source_handler
 
 
 def main():
-    # TODO: FFMPEG CHECK and fallbacks
+    # check for ffmpeg:
+    if not dependencies.ffmpeg_exists():
+        print(
+            "ffmpeg not installed or added to path. Please do so before trying again!"
+        )
+        return
+
+    # manage js_runtime_config
+    dependencies.config_js_runtime()
 
     # Loads the config from the json file and also manages output dir and path
     config, DOWNLOAD_TYPE, PLAYLIST_DOWNLOAD_TYPE, PLAYLIST_DOWNLOAD_CAP = (
