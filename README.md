@@ -2,7 +2,7 @@
 
 # Whytube
 
-##### Getting you the absolute best YouTube quality without the headache, bro.
+##### whytube? Because Youtube Sucks!
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org) [![FFmpeg](https://img.shields.io/badge/FFmpeg-Required-green.svg?style=for-the-badge&logo=ffmpeg&logoColor=white)](https://ffmpeg.org) [![uv](https://img.shields.io/badge/uv-Recommended-purple.svg?style=for-the-badge)](https://github.com/astral-sh/uv)
 [![Node.js](https://img.shields.io/badge/Node.js-Ready-339933.svg?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/) [![Deno](https://img.shields.io/badge/Deno-Ready-000000.svg?style=for-the-badge&logo=deno&logoColor=white)](https://deno.land/)
