@@ -1,83 +1,89 @@
+<div align="center">
+
 # Whytube
 
-A clean command-line YouTube downloader that intelligently selects the best available quality using codec and container preference rankings. (WIP)
+##### Getting you the absolute best YouTube quality without the headache, bro.
 
-## How it works
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org) [![FFmpeg](https://img.shields.io/badge/FFmpeg-Required-green.svg?style=for-the-badge&logo=ffmpeg&logoColor=white)](https://ffmpeg.org) [![uv](https://img.shields.io/badge/uv-Recommended-purple.svg?style=for-the-badge)](https://github.com/astral-sh/uv)
+[![Node.js](https://img.shields.io/badge/Node.js-Ready-339933.svg?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/) [![Deno](https://img.shields.io/badge/Deno-Ready-000000.svg?style=for-the-badge&logo=deno&logoColor=white)](https://deno.land/)
 
-Whytube doesn't just grab any format — it ranks every available stream by:
+<img alt="Mike Wazowoski" height="280" src="/assets/whytube_banner.png" />
 
-1. **Resolution** — higher is better
-2. **Codec** — preferred order: `av01 → vp9 → avc1`
-3. **Container** — preferred order: `mp4 → webm`
+</div>
 
-If your preferred codec or container isn't available, it gracefully falls back to the next best option. Only resolutions 720p and above are shown (unless none are available).
+</div>
 
-## Requirements
+## ⇁ TOC
 
-- Python 3.10+
-- [FFmpeg](https://ffmpeg.org/) — required for merging video and audio streams
-- [uv](https://github.com/astral-sh/uv) — recommended package manager
-- Node.js or Deno — required for solving YouTube's JS challenges
+- [Why This Exists](#-why-this-exists)
+- [How We Fix It](#-how-we-fix-it)
+- [What You Need](#-what-you-need)
+- [Quick Setup](#-quick-setup)
+- [Firing It Up](#-firing-it-up)
+- [Configs & Tweaks](#-configs--tweaks)
+- [Under the Hood](#-under-the-hood)
+- [Heads Up](#-heads-up)
 
-## Setup
+## ⇁ Why This Exists
 
-### 1. Clone the repo
+Parsing format IDs just to get decent video and audio sucks. Most CLI tools either hand you a trash 360p fallback or force you to write a paragraph of arguments just for a clean 1080p MP4. We needed something smarter and faster.
+
+## ⇁ How We Fix It
+
+**Whytube (WIP)** doesn't settle. It ranks every single stream and automatically snags the absolute best one based on:
+
+1. **Resolution** — higher is always better.
+2. **Codec** — preferred order: `av01 → vp9 → avc1`.
+3. **Container** — preferred order: `mp4 → webm`.
+
+If the top pick is missing, it gracefully falls back. We also enforce a strict 720p floor so your eyes don't bleed (unless it's literally the only resolution left).
+
+## ⇁ What You Need
+
+- **Python 3.10+**
+- **[FFmpeg](https://ffmpeg.org/)** — Required for merging video/audio streams.
+- **[uv](https://github.com/astral-sh/uv)** — Highly recommended for package management.
+- **Node.js or Deno** — Needed to bypass YouTube's JS challenges.
+
+## ⇁ Quick Setup
+
+Grab the repo and install dependencies in one go:
 
 ```bash
-git clone https://github.com/yourusername/whytube.git
+git clone https://github.com/nyniraula/Whytube.git
 cd whytube
-```
-
-### 2. Install dependencies
-
-```bash
 uv sync
+
+# `pip install yt-dlp[default]` if you're old school
 ```
 
-> [!TIP]
-> If you prefer pip: `pip install yt-dlp[default]`
+## ⇁ Firing It Up
 
-### 3. Run
+To get started, just run:
 
 ```bash
 uv run main.py
 ```
 
-Whytube will automatically detect your Node.js or Deno installation and configure itself. No manual path setup needed.
+_(Whytube auto-detects your Node/Deno setup, so no manual path config needed.)_
 
-## Usage
+### Single Video
 
-### Single video
+1. Paste the URL when prompted.
+2. Pick a resolution (caps at 720p minimum).
+3. Done. Video saves to `~/Downloads/WT_Downloads/`.
 
-1. Paste a YouTube URL when prompted
-2. Pick a resolution from the list (720p and above, falls back to lower if unavailable)
-3. Done — video saves to `~/Downloads/WT_Downloads/`
+### Playlists
 
-### Playlist
+Paste a playlist URL and Whytube handles it on autopilot. No per-video prompts. Caps at 1080p by default so it doesn't nuke your storage.
 
-Paste a playlist URL and Whytube handles the rest automatically — no per-video prompts. Caps at 1080p by default (configurable).
+### Audio Only
 
-### Audio
+Just want the tunes? Change `download_type` or `playlist_download_type` to `"audio"` in `config.json` to rip straight to `.m4a`.
 
-Set `download_type` or `playlist_download_type` to `"audio"` in `config.json` to download audio-only as `.m4a`.
+## ⇁ Configs & Tweaks
 
-## Module breakdown
-
-| Module               | What it does                                                 |
-| -------------------- | ------------------------------------------------------------ |
-| `source_handler.py`  | Loads config, sets up the download directory                 |
-| `URLresolver.py`     | Handles URL input, validates it, fetches media info          |
-| `MediaPipeline.py`   | Routes to the right handler — video, audio, or playlist      |
-| `downloader.py`      | Wraps yt-dlp's YoutubeDL and triggers the download           |
-| `format_ranking.py`  | Ranks available formats by codec and container preference    |
-| `format_resolver.py` | Deduplicates and filters ranked formats, enforces 720p floor |
-| `dependencies.py`    | Checks for FFmpeg, detects and configures JS runtime         |
-| `cleanup.py`         | Removes leftover thumbnail files after each download         |
-| `terminal.py`        | Cross-platform terminal clear                                |
-
-## Config
-
-Full `config.json` for reference:
+Whytube is fully customizable. Here's your `config.json`:
 
 ```json
 {
@@ -110,59 +116,37 @@ Full `config.json` for reference:
 ```
 
 > [!NOTE]
-> `js_runtimes` paths are automatically detected and updated at startup — you don't need to set these manually.
+> `js_runtimes` paths auto-update at startup. Also, editing `outtmpl` only changes the _filename_ template—files will always route to `~/Downloads/WT_Downloads/`.
 
-> [!WARNING]
-> `outtmpl` is overridden at runtime to save files in `~/Downloads/WT_Downloads/`. Editing it in `config.json` only changes the filename template, not the folder.
+### Subtitles
 
-## Download types
+- `writeautomaticsub`: Grabs auto-generated subs.
+- `writesubtitles`: Grabs manually uploaded subs.
+- `subtitleslangs`: Array of languages, defaults to `["en"]`.
+- Disable entirely by setting both write flags to `false`.
 
-Control what gets downloaded via these keys in `config.json`:
+### Thumbnails
 
-- `download_type` — applies to single video URLs. Set to `"video"` or `"audio"`
-- `playlist_download_type` — applies to playlist URLs. Set to `"video"` or `"audio"`
+Thumbnails are automatically embedded into the `.mp4` and leftover images are deleted. To turn this off, set `writethumbnail` and `embedthumbnail` to `false` and empty the `postprocessors` array.
 
-> [!NOTE]
-> If any key is missing or set to an unrecognised value, it defaults to `"video"`.
+## ⇁ Under the Hood
 
-## Subtitles
+| Module               | What it actually does                                        |
+| -------------------- | ------------------------------------------------------------ |
+| `source_handler.py`  | Loads config and preps the download directory.               |
+| `URLresolver.py`     | Validates URLs and fetches media info.                       |
+| `MediaPipeline.py`   | The traffic cop — routes to video, audio, or playlist logic. |
+| `downloader.py`      | Wraps yt-dlp and fires off the download.                     |
+| `format_ranking.py`  | Ranks formats based on codec and container preferences.      |
+| `format_resolver.py` | Cleans up ranked formats and enforces the 720p floor.        |
+| `dependencies.py`    | Auto-detects FFmpeg and JS runtimes.                         |
+| `cleanup.py`         | Wipes out leftover thumbnail files after a run.              |
+| `terminal.py`        | Cross-platform terminal clear to keep the UI clean.          |
 
-Whytube can download a separate subtitle file alongside the video. Controlled via these keys in `config.json`:
+## ⇁ Heads Up
 
-- `writeautomaticsub` — downloads auto-generated subtitles. On by default. Works on almost every video
-- `writesubtitles` — downloads manually uploaded subtitles if the creator provided them
-- `subtitleslangs` — list of language tracks to download. Defaults to `["en"]`
-- `subtitlesformat` — preferred format. `srt/ass/vtt` tries each in order, falling back if unavailable
-
-```json
-"writesubtitles": false,
-"writeautomaticsub": true,
-"subtitleslangs": ["en"],
-"subtitlesformat": "srt/ass/vtt"
-```
-
-> [!NOTE]
-> With the default config you'll get one `.srt` file for almost every video. Enabling both `writesubtitles` and `writeautomaticsub` may produce two subtitle files on videos that have both manual and auto-generated tracks.
-
-> [!TIP]
-> To disable subtitles entirely, set both `writesubtitles` and `writeautomaticsub` to `false`.
-
-## Thumbnails
-
-Whytube embeds thumbnails directly into the video file and cleans up the leftover image file automatically after each download. No stray `.jpg` or `.webp` files.
-
-To disable thumbnail embedding:
-
-```json
-"writethumbnail": false,
-"embedthumbnail": false,
-"postprocessors": []
-```
-
-## Notes
-
-- Video and audio are downloaded as separate streams and merged via FFmpeg into a final `.mp4`
-- Audio is re-encoded to AAC for maximum compatibility
-- FFmpeg is required — Whytube will exit with a clear error message if it's not found
-- JS runtime (Node.js or Deno) is required for solving YouTube's challenge — Whytube auto-detects whichever is installed
-- Config is reloaded every download loop, so changes to `config.json` take effect without restarting
+- Video and audio stream separately and are merged via FFmpeg.
+- Audio is always re-encoded to AAC for maximum compatibility.
+- **FFmpeg is mandatory.** The script will exit if it can't find it.
+- You **must** have a JS runtime installed (Node.js or Deno) to bypass anti-bot checks.
+- Configs reload on every download loop! You can tweak `config.json` while the app is running and it catches the updates instantly.
