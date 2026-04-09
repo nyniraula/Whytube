@@ -15,6 +15,16 @@
   "postprocessor_args": {
     "ffmpeg": ["-c:a", "aac"]
   },
+
+  "writethumbnail": true,
+  "embedthumbnail": true,
+
+  "postprocessors": [
+    {
+      "key": "EmbedThumbnail"
+    }
+  ],
+
   "js_runtimes": {
     "deno": {
       "path": null
