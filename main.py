@@ -1,4 +1,4 @@
-from utils import MediaPipeline, URLresolver, cleanup, dependencies, source_handler
+from utils import cleanup, dependencies, media_pipeline, source_handler, url_resolver
 
 
 def main():
@@ -19,16 +19,16 @@ def main():
             source_handler.setup()
         )
 
-        url, media_info = URLresolver.fetch_media_info(config)
+        url, media_info = url_resolver.fetch_media_info(config)
         title = media_info.get("title")
 
         # runs block if url is a playlist
-        if URLresolver.check_if_playlist(url):
-            MediaPipeline.handle_playlist(
+        if url_resolver.check_if_playlist(url):
+            media_pipeline.handle_playlist(
                 title, url, config, PLAYLIST_DOWNLOAD_TYPE, PLAYLIST_DOWNLOAD_CAP
             )
         else:
-            MediaPipeline.handle_video(
+            media_pipeline.handle_video(
                 title, url, config, media_info, DOWNLOAD_TYPE
             )  # for normal video
 
