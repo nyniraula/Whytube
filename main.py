@@ -1,4 +1,4 @@
-from utils import MediaPipeline, URLresolver, source_handler, terminal
+from utils import MediaPipeline, URLresolver, cleanup, source_handler
 
 
 def main():
@@ -26,14 +26,15 @@ def main():
 
         print("\nFinished Downloading")
 
+        # Runs cleanup function
+        cleanup.run()
+
         # download another prompt to re-loop
         quit_status = input("\nDownload Another? [y/N]: ")
 
         if not quit_status.lower() == "y":
             print("Exit Command Detected! Halting Execution")
             break
-
-        terminal.clear()
 
 
 if __name__ == "__main__":
