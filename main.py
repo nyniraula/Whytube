@@ -73,7 +73,6 @@ def download_media(fmt, url):
 
 def main():
 
-    # TODO: Add program loop to continue after a download.
     # TODO: Add subtitle download
     # TODO: Embed thubmnails into video
     # TODO: Organize CODE STRUCTURE
