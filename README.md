@@ -119,11 +119,23 @@ Full `config.json` for reference:
 {
   "no_warnings": true,
   "quiet": true,
+
+  //Output config
   "merge_output_format": "mp4",
   "outtmpl": "%(title)s - %(uploader)s.%(ext)s",
   "download_type": "video",
+
+  //Subtitle Config
+  "writesubtitles": false,
+  "writeautomaticsub": true,
+  "subtitleslangs": ["en"],
+  "subtitlesformat": "srt/ass/vtt",
+
+  //Playlist Config
   "playlist_download_type": "audio",
   "playlist_download_cap": "1080",
+
+  
   "postprocessor_args": {
     "ffmpeg": ["-c:a", "aac"]
   },
