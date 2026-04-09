@@ -89,6 +89,28 @@ Control what gets downloaded via these keys in `config.json`:
 "playlist_download_type": "audio"
 ```
 
+## Subtitles
+
+Whytube can download a separate subtitle file alongside the video. Controlled via these keys in `config.json`:
+
+- `writeautomaticsub` — downloads auto-generated subtitles (YouTube's AI captions). On by default. Works on almost every video
+- `writesubtitles` — downloads manually uploaded subtitles if the creator provided them
+- `subtitleslangs` — list of language tracks to download. Defaults to `["en"]`
+- `subtitlesformat` — preferred format. `srt/ass/vtt` tries each in order, falling back if unavailable
+
+```json
+"writesubtitles": false,
+"writeautomaticsub": true,
+"subtitleslangs": ["en"],
+"subtitlesformat": "srt/ass/vtt"
+```
+
+> [!NOTE]
+> With the default config, you'll get one `.srt` file for almost every video. Enabling both `writesubtitles` and `writeautomaticsub` may produce two subtitle files on videos that have both manual and auto-generated tracks.
+
+> [!TIP]
+> To disable subtitles entirely, set both `writesubtitles` and `writeautomaticsub` to `false`.
+
 ## Config
 
 Full `config.json` for reference:
