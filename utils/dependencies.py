@@ -27,6 +27,9 @@ def config_js_runtime():
         }
 
     else:
+        print(
+            "No JS runtime. YouTube thinks youre a 2013 Samsung Galaxy. Act accordingly."
+        )
         return
 
     with open("config.json", "r+") as file:

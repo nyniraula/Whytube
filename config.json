@@ -2,13 +2,13 @@
   "no_warnings": true,
   "quiet": true,
   "merge_output_format": "mp4",
-  "outtmpl": "%(title)s - %(uploader)s.%(ext)s",
+  "outtmpl": "%(title)s - %(uploader)s_[%(height)sp].%(ext)s",
   "download_type": "video",
   "writesubtitles": false,
   "writeautomaticsub": true,
   "subtitleslangs": ["en"],
   "subtitlesformat": "srt/ass/vtt",
-  "playlist_download_type": "video",
+  "playlist_download_type": "audio",
   "playlist_download_cap": "1080",
   "postprocessor_args": {
     "ffmpeg": ["-c:a", "aac"]
@@ -25,7 +25,7 @@
       "path": null
     },
     "node": {
-      "path": null
+      "path": "C:\\Program Files\\nodejs\\node.EXE"
     }
   }
 }

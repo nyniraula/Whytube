@@ -7,7 +7,7 @@ from utils import terminal
 def get_media_url():
     while True:
         try:
-            url = input("Video url: ").strip()
+            url = input("the link: ").strip()
             if not url:
                 raise ValueError
             break
@@ -29,7 +29,7 @@ def fetch_media_info(config):
 
             except DownloadError:
                 terminal.clear()
-                print("Invalid url, Try again!")
+                print("That's a link to what exactly? Try again.")
 
         return (url, media_info)
 

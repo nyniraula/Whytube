@@ -21,7 +21,7 @@ def handle_video(title, url, config, media_info, DOWNLOAD_TYPE):
         handle_audio(url, config)
     else:
         formats = media_info.get("formats")
-        print("Choose a resolution to download: \n")
+        print("Pick your poison: \n")
         ranked_data = format_ranking.rank_format_options(formats)
         downloadable_formats = format_resolver.resolve_format_options(
             ranked_data, formats
@@ -46,7 +46,9 @@ def handle_video(title, url, config, media_info, DOWNLOAD_TYPE):
 
 
 def handle_playlist(title, url, config, PLAYLIST_DOWNLOAD_TYPE, PLAYLIST_DOWNLOAD_CAP):
-    print(f"\n[DOWNLOADING PLAYLIST]: {title}")
+    print(
+        f"\n[Whole playlist detected. Pouring one out for your SSD.]\n Title: {title}"
+    )
 
     if PLAYLIST_DOWNLOAD_TYPE == "audio":
         handle_audio(url, config)

@@ -1,12 +1,12 @@
+from time import sleep
+
 from utils import cleanup, dependencies, media_pipeline, source_handler, url_resolver
 
 
 def main():
     # check for ffmpeg:
     if not dependencies.ffmpeg_exists():
-        print(
-            "ffmpeg not installed or added to path. Please do so before trying again!"
-        )
+        print("FFmpeg not found. Genuinely how?")
         return
 
     # manage js_runtime_config
@@ -32,16 +32,20 @@ def main():
                 title, url, config, media_info, DOWNLOAD_TYPE
             )  # for normal video
 
-        print("\nFinished Downloading")
+        print("\nDone. Go touch grass.")
 
         # Runs cleanup function
         cleanup.run()
 
+        sleep(1)
+
         # download another prompt to re-loop
-        quit_status = input("\nDownload Another? [y/N]: ")
+        quit_status = input(
+            "\nYour storage called. It's crying. Download another? [y/N]: "
+        )
 
         if not quit_status.lower() == "y":
-            print("Exit Command Detected! Halting Execution")
+            print("\nCtrl+C. The last resort of a broken man. Goodbye.")
             break
 
 
